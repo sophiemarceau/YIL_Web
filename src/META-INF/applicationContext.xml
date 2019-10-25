@@ -1,0 +1,145 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+                           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+  
+    <context:annotation-config />
+    <context:component-scan base-package="com" />
+    
+    <mvc:annotation-driven/>
+    
+    <!-- SQL 注入拦截器 -->
+    <mvc:interceptors>
+		<!-- mvc:interceptor>
+			<mvc:mapping path="/**"/ -->
+			<bean class="com.yyl.common.SqlInjectIntercepter"/>
+		<!-- /mvc:interceptor-->
+	</mvc:interceptors>
+
+    <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+        <property name="prefix" value="/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+   
+  <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+	<property name="sessionFactory" ref="sessionFactory"></property>
+	<property name="dataSource" ref="dataSource" />
+  </bean>
+    
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <beans>
+    
+    <!-- 文件上传 -->
+    <bean id="multipartResolver" 
+    class="org.springframework.web.multipart.commons.CommonsMultipartResolver">   
+        <property name="maxUploadSize">   
+        <value>104857600</value>  
+    	</property>  
+   </bean>
+  
+    
+    <!-- 自动搜索@Controller标注的类 -->  
+    <context:component-scan base-package="com.*.controller"/>      
+    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>    
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">  
+         <property name="messageConverters">
+      <list>
+        <bean
+          class="org.springframework.http.converter.StringHttpMessageConverter">
+          <property name="supportedMediaTypes">
+            <list>
+              <value>text/plain;charset=UTF-8</value>
+              <value>text/html;charset=UTF-8</value>
+            </list>
+          </property>
+        </bean>
+        <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+          <property name="supportedMediaTypes">
+            <list>
+              <value>
+                application/json;charset=UTF-8
+              </value>
+              <value>
+                application/x-www-form-urlencoded;charset=UTF-8
+              </value>
+            </list>
+          </property>
+        </bean>
+      </list>
+    </property>
+    </bean>
+        <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+			<!--  
+	        <property name="driverClassName" value="com.mysql.jdbc.Driver"/> 
+	        <property name="url" value="jdbc:mysql://115.28.129.210/ielts"/>
+			-->
+	        <!-- SQL Server -->
+	         <!--  
+	        <property name="driverClassName" value="net.sourceforge.jtds.jdbc.Driver" />
+        	<property name="url" value="jdbc:jtds:sqlserver://192.168.25.192:1433/IELTS_PD;useLOBs=false" />
+	        <property name="username" value="db_ielits_user"/> 
+	        <property name="password" value="p#joweii3k"/> 
+	      	-->
+	           
+	           <property name="driverClassName">  
+					<value>com.mysql.jdbc.Driver</value>  
+					</property>  
+					<property name="url">  
+					<value>jdbc:mysql://123.57.217.223/youelink</value>  
+					</property>  
+					<property name="username">  
+					<value>root</value>  
+					</property>  
+					<property name="password">  
+					<value>LCKgzg9nhXCg</value>  
+				</property>  
+	            
+		</bean>        
+         
+        <bean id="sessionFactory"  class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"> 
+			<property name="dataSource" ref="dataSource"/> 
+			<property name="packagesToScan" value="com.myhib" />  
+			 
+			  <property name="mappingResources"> 
+			    <list> 
+			    <!-- <value>com/xdf/IELTS/DbModal/UserInfo.hbm.xml</value>
+			     <value>com/xdf/IELTS/DbModal/StudentInfo.hbm.xml</value>
+			       <value>com/xdf/IELTS/DbModal/LabelCatagory.hbm.xml</value>
+			     <value>com/xdf/IELTS/DbModal/LabelInfo.hbm.xml</value> -->
+			    </list> 
+			</property>
+			
+        	<property name="hibernateProperties">  
+            <props>  
+
+            <!--
+             <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+			-->
+             <!-- SQL dialect -->
+        	<!-- <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop> -->
+        	 <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+        	 
+             <!-- <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop> -->
+             
+             <prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>  
+             <prop key="hibernate.show_sql">true</prop>  
+             <prop key="hibernate.hbm2ddl.auto">update</prop>  
+             <prop key="hibernate.format_sql">true</prop>  
+            </props>  
+        </property>  
+    	</bean>
+   
+    </beans>
+
+</beans>
